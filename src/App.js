@@ -25,9 +25,52 @@ export class App extends Component {
   });
 
   handleChange = (e) => {
-    this.setState({
-      account: { ...this.state.account, [e.target.name]: e.target.value },
-    });
+    const schemaDummy = {
+      username: Joi.string()
+        .alphanum()
+        .min(3)
+        .max(30)
+        .required()
+        .label("Username"),
+      email: Joi.string()
+        .email({
+          minDomainSegments: 2,
+          tlds: { allow: ["com", "net"] },
+        })
+        .label("Email"),
+    };
+    const validatePropery = (name, value) => {
+      const obj = {
+        [name]: value,
+      };
+      const fieldSchema = Joi.object({
+        [name]: schemaDummy[name],
+      });
+      //return result
+      const result = fieldSchema.validate(obj, {
+        abortEarly: false,
+      });
+      return result;
+      // result.error === null -> valid
+    };
+    let res = validatePropery(e.target.name, e.target.value);
+    if (res?.error?.details || false) {
+      this.setState({
+        account: { ...this.state.account, [e.target.name]: e.target.value },
+        errors: {
+          ...this.state.errors,
+          [res.error.details[0].path[0]]: res.error.details[0].message,
+        },
+      });
+    } else {
+      this.setState({
+        account: { ...this.state.account, [e.target.name]: e.target.value },
+        errors: {
+          ...this.state.errors,
+          [e.target.name]: "",
+        },
+      });
+    }
   };
 
   handleSubmit = (e) => {
