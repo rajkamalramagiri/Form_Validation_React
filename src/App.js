@@ -1,33 +1,41 @@
-import React from "react";
+import "./App.css";
+
+import { TextField } from "@material-ui/core";
+import Button from "@material-ui/core/Button";
 import { useForm } from "react-hook-form";
 
-export default function App() {
+function App() {
   const {
     register,
-    formState: { errors },
     handleSubmit,
+    watch,
+    formState: { errors },
   } = useForm();
-  console.log("error", errors);
   const onSubmit = (data) => {
     console.log(data);
+    alert("clciked");
   };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <input
-        {...register("email", {
-          required: "email requierd",
-          pattern: {
-            value: /^\S+@\S+$/i,
-            message: "This is not a valid email",
-          },
-        })}
+    <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
+      {/* basic text field */}
+      <TextField
+        variant="outlined"
+        {...register("example", { required: "input madatory" })}
+        error={(errors.example?.message && true) || false}
+        helperText={errors.example?.message || ""}
       />
-      <span>{errors.email.message}</span>
 
-      <input {...register("lastName", { required: true })} />
-      {errors.lastName && "Last name is required"}
-
-      <input type="submit" />
+      <Button
+        type="submit"
+        variant="contained"
+        color="primary"
+        disabled={(errors.example?.message && true) || false}
+      >
+        Primary
+      </Button>
     </form>
   );
 }
+
+export default App;
